@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Product Landing Page</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f8f8f8;
+    }
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      padding: 20px;
+      gap: 20px;
+      max-width: 1200px;
+      margin: auto;
+      background: white;
+      border-radius: 15px;
+    }
+
+    /* Left Side */
+    .product-images {
+      flex: 1;
+      min-width: 300px;
+      background: linear-gradient(135deg, #cce7ff, #99ccff);
+      padding: 15px;
+      border-radius: 15px;
+      position: relative;
+    }
+
+    /* Back Arrow */
+    .back-arrow {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 22px;
+      background: white;
+      border-radius: 50%;
+      padding: 8px 12px;
+      cursor: pointer;
+      border: 1px solid #ccc;
+      transition: 0.3s;
+    }
+
+    .back-arrow:hover {
+      background: #e0e0e0;
+      transform: scale(1.1);
+    }
+
+    .main-image {
+      width: 100%;
+      max-height: 400px;
+      object-fit: contain;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      margin-top: 50px;
+    }
+
+    .sub-images {
+      display: flex;
+      margin-top: 10px;
+      gap: 10px;
+    }
+
+    .sub-images img {
+      width: 60px;
+      height: 60px;
+      object-fit: contain;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .sub-images img:hover {
+      border-color: #000;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Right Side */
+    .product-details {
+      flex: 1;
+      min-width: 300px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 30px;
+      background: linear-gradient(135deg, #f9f9f9, #e0e0e0);
+      border-radius: 15px;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    }
+
+    .product-details h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .prices {
+      font-size: 18px;
+      gap: 10px;
+    }
+
+    .old-price {
+      text-decoration: line-through;
+      color: grey;
+    }
+
+    .new-price {
+      font-weight: bold;
+      color: green;
+    }
+
+    .rating {
+      color: #FFA500;
+    }
+
+    /* Features */
+    .features {
+      display: flex;
+      overflow-x: auto;
+      gap: 15px;
+      margin-top: 10px;
+      padding-bottom: 10px;
+    }
+
+    .feature-box {
+      min-width: 180px;
+      padding: 20px;
+      background: linear-gradient(135deg, #e0eafc, #cfdef3);
+      border-radius: 15px;
+      text-align: center;
+      flex-shrink: 0;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      font-weight: 600;
+      font-size: 16px;
+      color: #222;
+    }
+
+    .buy-button {
+      padding: 15px;
+      background: orange;
+      border: none;
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+      border-radius: 10px;
+    }
+
+    .share-button {
+      margin-left: 10px;
+      padding: 15px;
+      background: #25D366;
+      border: none;
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .share-options {
+      position: absolute;
+      background: white;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      border-radius: 10px;
+      padding: 10px;
+      margin-top: 8px;
+      display: none;
+      z-index: 100;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .share-options a {
+      text-decoration: none;
+      color: #333;
+      font-weight: 600;
+      font-size: 16px;
+    }
+
+    /* Reviews Section */
+    .review-section {
+      margin-top: 30px;
+    }
+
+    .reviews-boxes {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-top: 10px;
+    }
+
+    .review-box {
+      padding: 15px 20px;
+      background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
+      border-radius: 15px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      font-style: italic;
+      color: #333;
+      font-size: 15px;
+    }
+
+    /* Buttons container */
+    .button-group {
+      display: flex;
+      align-items: center;
+      margin-top: 20px;
+    }
+
+    /* Responsive */
+    @media(max-width: 768px){
+      .container {
+        flex-direction: column;
+      }
+      .features {
+        overflow-x: scroll;
+      }
+      .button-group {
+        flex-direction: column;
+        gap: 10px;
+      }
+      .share-button {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Left Side -->
+  <div class="product-images">
+    <div class="back-arrow" onclick="window.location.href='dropdown_laptop.html'">🔙</div>
+
+    <img id="mainImage" src="images2/g.jpg" alt="Product" class="main-image" />
+
+    <div class="sub-images">
+      <img src="images2/g1.jpg" onclick="changeImage(this.src)" alt="Sub Model" />
+      <img src="images2/g2.jpg" onclick="changeImage(this.src)" alt="Sub Model" />
+      <img src="images2/g3.jpg" onclick="changeImage(this.src)" alt="Sub Model" />
+    </div>
+>
+<!-- About section -->
+<div style="margin-top:15px; padding:10px; background-color: #e0f7fa; border-radius:10px;">
+  <h4>About the Phone</h4>
+  <p style="margin:0; font-size:14px; color:#555;">
+    microsoft product combine powerful processing capabilities with compact form factors, enabling users to stay productive on the go. Modern laptops come with sleek designs, long battery life, and a variety of features tailored for different needs.  </p>
+</div>
+
+  </div>
+
+  <!-- Right Side -->
+  <div class="product-details">
+    <h1> Microsoft Surface Laptop 7 (256GB SSD)</h1>
+    <div class="prices">
+      <span class="old-price">₹112000</span>
+      <span class="new-price">₹102000</span>
+    </div>
+    <div class="rating">⭐⭐⭐⭐☆</div>
+   
+<h3 style="margin-top: 20px; margin-bottom: 10px;">Available</h3>
+<div class="available-options" style="font-size: 16px; color: #444; display: flex; gap: 20px;">
+  <div>128GB - 6GB RAM-i5</div>
+  <div>256GB - 8GB RAM-i7</div>
+</div>
+
+
+    <h3 style="margin-top: 30px; margin-bottom: 10px;">Features</h3>
+    <div class="features">
+      <div class="feature-box">Backlit Keyboard</div>
+      <div class="feature-box">Fingerprint Reader</div>
+      <div class="feature-box">Bluetooth 5.3,Wi-Fi 6</div>
+      <div class="feature-box">Lightweight (less than 2kg) </div>
+      <div class="feature-box">Numeric Keypad</div>
+    </div>
+
+    <div class="button-group" style="position: relative;">
+      <a href="laptop_pay.html">
+        <button class="buy-button">Buy Now</button>
+      </a>
+      <button class="share-button" id="shareBtn">Share</button>
+      <div class="share-options" id="shareOptions">
+        <a href="https://wa.me/?text=Check%20out%20this%20awesome%20product%21%20Link%3A%20YOUR_PRODUCT_URL" target="_blank">WhatsApp</a>
+        <a href="mailto:?subject=Awesome Product&body=Check%20out%20this%20awesome%20product!%20Link:%20YOUR_PRODUCT_URL" target="_blank">Email</a>
+        <a href="https://www.facebook.com/sharer/sharer.php?u=YOUR_PRODUCT_URL" target="_blank">Facebook</a>
+      </div>
+    </div>
+
+    <div class="review-section">
+      <h3>Customer Reviews</h3>
+      <div class="reviews-boxes">
+        <div class="review-box">⭐⭐⭐⭐⭐ “Amazing quality and design!” – Rajesh</div>
+        <div class="review-box">⭐⭐⭐⭐ “Looks premium, great value for money.” – Sneha</div>
+        <div class="review-box">⭐⭐⭐ “Decent product, strap quality okay.” – Arjun</div>
+        <div class="review-box">⭐⭐⭐⭐⭐ “Perfect gift for my brother!” – Meena</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Change image function
+  function changeImage(src) {
+    document.getElementById('mainImage').src = src;
+  }
+
+  // Share button functionality
+  document.getElementById("shareBtn").addEventListener("click", async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "Awesome Product",
+          text: "Check out this amazing product! 🚀",
+          url: "https://uma-cell.github.io/Product-Landing-Page/microsoft.html"
+        });
+      } catch (err) {
+        console.log("Share cancelled:", err);
+      }
+    } else {
+      alert("Sharing not supported on this browser.");
+    }
+  });
+</script>
+
+</body>
+</html>

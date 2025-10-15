@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Product Chatbot</title>
+<style>
+  body { margin: 0; font-family: "Poppins", sans-serif; background: #f4f7fa; }
+  .chat-container {
+    display: flex; flex-direction: column; height: 100vh; width: 100%; 
+  }
+  .chat-box {
+    flex: 1; display: flex; flex-direction: column;
+    max-width: 500px; margin: auto; border-radius: 10px; overflow: hidden; box-shadow: 0 0 20px rgba(0,0,0,0.1); background:#fff;
+  }
+  .header { background-color: #007bff; color: #fff; text-align: center; padding: 15px; font-weight: bold; }
+  #messages { flex: 1; padding: 15px; overflow-y: auto; }
+  .message { margin-bottom: 12px; padding: 10px; border-radius: 8px; max-width: 80%; word-wrap: break-word; line-height: 1.4; }
+  .user { background-color: #007bff; color: #fff; align-self: flex-end; }
+  .bot { background-color: #e0e0e0; align-self: flex-start; }
+  .footer { display: flex; border-top: 1px solid #ccc; }
+  #input { flex: 1; padding: 12px; border: none; outline: none; font-size: 14px; }
+  #send { padding: 12px 20px; background-color: #007bff; color: white; border: none; cursor: pointer; font-size: 16px; }
+  #send:hover { background-color: #0056b3; }
+  .typing {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    margin-right: 3px;
+    background: #999;
+    border-radius: 50%;
+    animation: blink 1.4s infinite both;
+  }
+  @keyframes blink {
+    0%, 80%, 100% { opacity: 0; }
+    40% { opacity: 1; }
+  }
+</style>
+</head>
+<body>
+<div class="chat-container">
+  <div class="chat-box">
+    <div class="header">🤖 Smart Product Chat</div>
+    <div id="messages"></div>
+    <div class="footer">
+      <input id="input" type="text" placeholder="Type your message here..." onkeydown="if(event.key==='Enter') sendMessage()" />
+      <button id="send" onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const responses = {
+    "hi": "👋 Hello! How can I assist you today?",
+    "what is the use of this product landing page": "🏷️ This page showcases the latest products with the best discounts. It features a variety of products like phones, laptops, smart watches, and apparel. Our chatbot helps you get instant information for smooth shopping! ✨",
+    "what are the specifications of redmi note 13 pro 5g": "📱 Redmi Note 13 Pro 5G specs:\n- Display: 6.67\" AMOLED, 120Hz\n- Processor: Snapdragon 7s Gen 2\n- RAM: 8GB\n- Storage: 128/256GB\n- Camera: 200MP + 8MP + 2MP\n- Battery: 5100mAh",
+    "what are the specifications of iphone 15 pro": "🍎 iPhone 15 Pro specs:\n- Display: 6.1\" Super Retina XDR (OLED)\n- Processor: Apple A17 Pro\n- RAM: 8GB\n- Storage: 128/256/512/1TB\n- Camera: 48MP + 12MP + 12MP\n- Battery: 3274mAh",
+    "cancel the order": "✅ Your order has been successfully canceled. If you need further assistance, please let me know!",
+    "compare flipkart with meesho": "🤖 Comparison: Flipkart vs Meesho\nFlipkart offers a wide range of products, fast delivery, and strong customer service, perfect for quick and reliable shopping.\nMeesho focuses on resellers and small business owners with competitive prices and bulk buying options.\nOverall, our product landing page provides a seamless shopping experience with instant chatbot support.",
+    "how to cancel an order": "To cancel an order, please type 'cancel the order' and our chatbot will assist you immediately.",
+    "what is the delivery time": "Delivery time varies by product and location but is usually between 3 to 7 days. You can check your order status for exact details.",
+    "what is your return policy": "We offer returns within 7 days of delivery for most products. Please refer to the product page for specific return details.",
+    "do you have cash on delivery": "Yes, cash on delivery is available for most products. Please check the product page or at checkout.",
+    "show me reviews for [product]": "You can find customer reviews on the respective product page under the reviews section.",
+    "thank you": "You're welcome! If you have more questions, just ask.",
+  };
+
+  function sendMessage() {
+    let inputField = document.getElementById("input");
+    let userMsg = inputField.value.trim().toLowerCase();
+    if (userMsg === "") return;
+    addMessage(inputField.value, "user");
+    inputField.value = "";
+
+    addTypingIndicator();
+    setTimeout(() => {
+      removeTypingIndicator();
+      let botReply = responses[userMsg] || "😅 Sorry, I didn't understand that. Please ask something else or try common questions like product specifications or order status.";
+      addMessage(botReply, "bot");
+    }, 1200);
+  }
+
+  function addMessage(text, sender) {
+    const messageContainer = document.getElementById("messages");
+    const messageDiv = document.createElement("div");
+    messageDiv.classList.add("message", sender);
+    messageDiv.textContent = text;
+    messageContainer.appendChild(messageDiv);
+    messageContainer.scrollTop = messageContainer.scrollHeight;
+  }
+
+  function addTypingIndicator() {
+    const messageContainer = document.getElementById("messages");
+    const typingDiv = document.createElement("div");
+    typingDiv.id = "typing";
+    typingDiv.classList.add("message", "bot");
+    typingDiv.innerHTML = '<span class="typing"></span><span class="typing"></span><span class="typing"></span>';
+    messageContainer.appendChild(typingDiv);
+    messageContainer.scrollTop = messageContainer.scrollHeight;
+  }
+
+  function removeTypingIndicator() {
+    const typingDiv = document.getElementById("typing");
+    if (typingDiv) typingDiv.remove();
+  }
+</script>
+</body>
+</html>

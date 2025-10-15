@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Mobile Collection</title>
+  <style>
+    :root{
+      --bg:#f0f9ff;
+      --box-bg:#e6f6ff;
+      --card:#ffffff;
+      --accent:#2ab57d;
+      --muted:#6b7280;
+      --gap:16px;
+    }
+
+    body {
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans", Arial;
+      background: var(--bg);
+      color: #111827;
+      padding: 20px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    .back-btn {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      background: white;
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      z-index: 110;
+    }
+    .back-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+    }
+
+    .container {
+      max-width:1100px;
+      margin: 60px auto 0 auto;
+    }
+
+    h1 {
+      font-size: 20px;
+      margin: 0 0 8px 0;
+      text-align: center;
+    }
+
+    .search-cart-wrapper {
+      display: flex;
+      align-items: center;
+      max-width: 420px;
+      margin: 10px auto 20px auto;
+      gap: 12px;
+    }
+
+    .search-bar {
+      flex-grow: 1;
+      background: var(--box-bg);
+      padding: 8px 12px;
+      border-radius: 12px;
+      box-shadow: 0 3px 10px rgba(16, 24, 40, 0.1);
+    }
+    .search-bar input[type="search"] {
+      width: 100%;
+      border: none;
+      background: transparent;
+      font-size: 14px;
+      padding: 6px 8px;
+      outline: none;
+      color: #111827;
+    }
+
+    .cart-toggle {
+      background: var(--accent);
+      border: none;
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      color: white;
+      font-size: 22px;
+      cursor: pointer;
+      z-index: 120;
+      position: static; /* Remove fixed */
+      transition: background 0.3s ease;
+     }
+    .cart-toggle:hover {
+      background: #238a5d;
+    }
+
+    .box {
+      background: var(--box-bg);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 6px 20px rgba(16,24,40,0.06);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px,1fr));
+      gap: var(--gap);
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 2px 6px rgba(15,23,42,0.08);
+      transition: transform 0.2s ease;
+      position: relative;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+    }
+
+    .img-wrap {
+      padding: 12px;
+      background: #fafafa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .img-wrap img {
+      width: 100%;
+      max-height: 180px;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+
+    .wish {
+      position: absolute;
+      right: 8px;
+      top: 8px;
+      background: rgba(255,255,255,0.9);
+      border-radius: 999px;
+      padding: 6px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .card-body {
+      padding: 10px 12px 14px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .brand {
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .title {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .rating {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .price-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 4px;
+    }
+
+    .price {
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .old-price {
+      font-size: 12px;
+      color: var(--muted);
+      text-decoration: line-through;
+      margin-left: 8px;
+    }
+
+    .discount {
+      background: rgba(42,181,125,0.12);
+      color: var(--accent);
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+    }
+    .add-cart-btn {
+      margin-top: 8px;
+      background: var(--accent);
+      border: none;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .add-cart-btn:hover {
+      background: #238a5d;
+    }
+
+    .cart-panel {
+      position: fixed;
+      top: 0;
+      right: -350px;
+      width: 350px;
+      height: 100%;
+      background: white;
+      box-shadow: -2px 0 8px rgba(0,0,0,0.1);
+      transition: right 0.3s ease;
+      z-index: 115;
+      display: flex;
+      flex-direction: column;
+    }
+    .cart-panel.open {
+      right: 0;
+    }
+    .cart-header {
+      padding: 16px;
+      font-weight: 700;
+      font-size: 18px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .cart-close {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      line-height: 1;
+      color: var(--muted);
+      font-weight: 700;
+    }
+    .cart-items {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 10px 16px;
+    }
+    .cart-item {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 15px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 10px;
+    }
+    .cart-item img {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    .cart-item-info {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .cart-item-title {
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+    .cart-item-price {
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .cart-item-qty {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .qty-btn {
+      border: none;
+      background: var(--box-bg);
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 16px;
+      line-height: 1;
+    }
+    .remove-btn {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 14px;
+      margin-top: 4px;
+      align-self: flex-start;
+      padding: 0;
+    }
+
+    .cart-footer {
+      padding: 16px;
+      border-top: 1px solid #eee;
+      font-weight: 700;
+      font-size: 16px;
+      text-align: right;
+    }
+
+    @media (max-width:420px){
+      body {padding: 12px;}
+      .container {margin-top: 70px;}
+      .cart-panel {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <button class="back-btn" onclick="window.location.href='homepage.html'">←</button>
+
+  <div class="container">
+    <h1>📱 Latest Mobile Phones Collection</h1>
+    <div class="search-cart-wrapper">
+      <div class="search-bar">
+        <input type="search" id="searchInput" placeholder="Search phones..." />
+      </div>
+      <button class="cart-toggle" id="cartToggle" title="Toggle Cart">🛒</button>
+    </div>
+
+    <div class="box">
+      <div id="grid" class="grid"></div>
+    </div>
+  </div>
+
+  <div class="cart-panel" id="cartPanel">
+    <div class="cart-header">
+      Cart <button class="cart-close" id="cartClose" title="Close Cart">×</button>
+    </div>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-footer" id="cartTotal">Total: ₹0</div>
+  </div>
+
+  <script>
+    const products = [
+      { brand:"Apple", title:"iPhone 15 Pro (128GB)", price:134999, oldPrice:149900, discount:10, rating:4.8, reviews:"12k", img:"images/iphone15pro.jpg",page:"apple.html" },
+      { brand:"Samsung", title:"Galaxy S24 Ultra 5G", price:119999, oldPrice:129999, discount:8, rating:4.7, reviews:"8k", img:"images/s24ultra.jpg",page:"samsung.html"  },
+      { brand:"OnePlus", title:"OnePlus 12R 5G (256GB)", price:45999, oldPrice:49999, discount:8, rating:4.6, reviews:"15k", img:"images/oneplus12r.jpg",page:"oneplus.html"  },
+      { brand:"Realme", title:"Realme 12 Pro+ 5G", price:29999, oldPrice:34999, discount:14, rating:4.5, reviews:"9k", img:"images/realme12pro.jpg",page:"realme.html"  },
+      { brand:"Redmi", title:"Redmi Note 13 Pro 5G", price:24999, oldPrice:27999, discount:11, rating:4.3, reviews:"6k", img:"images/redmi13pro.jpg",page:"redmi.html"  },
+      { brand:"Vivo", title:"Vivo V30 5G (128GB)", price:31999, oldPrice:35999, discount:11, rating:4.4, reviews:"7.8k", img:"images/vivov30.jpg",page:"vivo.html"  },
+      { brand:"Oppo", title:"Oppo Reno 11 5G", price:34999, oldPrice:38999, discount:10, rating:4.4, reviews:"5k", img:"images/opporeno11.jpg",page:"oppo.html"  },
+      { brand:"Google", title:"Pixel 8 5G (128GB)", price:72999, oldPrice:82999, discount:12, rating:4.6, reviews:"3.4k", img:"images/pixel8.jpg",page:"google.html"  },
+      { brand:"Nothing", title:"lenovo Phone 5G (128GB)", price:27999, oldPrice:32999, discount:15, rating:4.5, reviews:"4.2k", img:"images/lenovo2a.jpg",page:"nothing.html"  },
+      { brand:"Vivo", title:"Vivo y300 phone 5G (128GB)", price:21999, oldPrice:25999, discount:10, rating:4.3, reviews:"2.1k", img:"images/vivo.jpg" },
+      { brand:"Motorola", title:"Motorola Edge 40", price:39999, oldPrice:44999, discount:11, rating:4.2, reviews:"3.5k", img:"images/motoedge40.jpg" }
+    ];
+
+    const grid = document.getElementById('grid');
+    const searchInput = document.getElementById('searchInput');
+    const cartToggle = document.getElementById('cartToggle');
+    const cartPanel = document.getElementById('cartPanel');
+    const cartClose = document.getElementById('cartClose');
+    const cartItemsContainer = document.getElementById('cartItems');
+    const cartTotalDisplay = document.getElementById('cartTotal');
+
+    let cart = {};
+
+    function createCard(p, index){
+      const div = document.createElement('div');
+      div.className = 'card';
+      div.innerHTML = `
+        <div class="img-wrap">
+          <img src="${p.img}" alt="${p.title}" />
+          <div class="wish" title="Add to wishlist">💖</div>
+        </div>
+        <div class="card-body">
+          <div class="brand">${p.brand}</div>
+          <div class="title">${p.title}</div>
+          <div class="rating">⭐ ${p.rating} · ${p.reviews} reviews</div>
+          <div class="price-row">
+            <div>
+              <span class="price">₹${p.price}</span>
+              <span class="old-price">₹${p.oldPrice}</span>
+            </div>
+            <div class="discount">↓${p.discount}%</div>
+          </div>
+          <button class="add-cart-btn" data-index="${index}">Add to Cart</button>
+        </div>
+      `;
+      div.addEventListener('click', (e) => {
+        if(!e.target.classList.contains('add-cart-btn') && !e.target.classList.contains('wish')){
+          window.location.href = p.page;
+        }
+      });
+      return div;
+    }
+
+    function displayProducts(items) {
+      grid.innerHTML = '';
+      items.forEach((p, idx) => grid.appendChild(createCard(p, idx)));
+      document.querySelectorAll('.add-cart-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const index = btn.getAttribute('data-index');
+          addToCart(index);
+        });
+      });
+    }
+
+    function addToCart(index) {
+      const product = products[index];
+      if(cart[product.title]){
+        cart[product.title].quantity +=1;
+      } else {
+        cart[product.title] = {...product, quantity: 1};
+      }
+      updateCartDisplay();
+      openCart();
+    }
+
+    function removeFromCart(title) {
+      delete cart[title];
+      updateCartDisplay();
+    }
+
+    function changeQuantity(title, delta) {
+      if(cart[title]){
+        cart[title].quantity += delta;
+        if(cart[title].quantity <= 0){
+          removeFromCart(title);
+        } else {
+          updateCartDisplay();
+        }
+      }
+    }
+
+    function updateCartDisplay() {
+      cartItemsContainer.innerHTML = '';
+      let total = 0;
+      Object.values(cart).forEach(item => {
+        total += item.price * item.quantity;
+        const cartItem = document.createElement('div');
+        cartItem.className = 'cart-item';
+        cartItem.innerHTML = `
+          <img src="${item.img}" alt="${item.title}" />
+          <div class="cart-item-info">
+            <div class="cart-item-title">${item.brand} - ${item.title}</div>
+            <div class="cart-item-price">₹${item.price * item.quantity}</div>
+            <div class="cart-item-qty">
+              <button class="qty-btn" data-title="${item.title}" data-action="decrease">-</button>
+              <span>${item.quantity}</span>
+              <button class="qty-btn" data-title="${item.title}" data-action="increase">+</button>
+            </div>
+            <button class="remove-btn" data-title="${item.title}">Remove</button>
+          </div>
+        `;
+        cartItemsContainer.appendChild(cartItem);
+      });
+      cartTotalDisplay.textContent = `Total: ₹${total}`;
+      document.querySelectorAll('.qty-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const title = btn.getAttribute('data-title');
+          const action = btn.getAttribute('data-action');
+          if(action === 'increase'){
+            changeQuantity(title, 1);
+          } else {
+            changeQuantity(title, -1);
+          }
+        });
+      });
+      document.querySelectorAll('.remove-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const title = btn.getAttribute('data-title');
+          removeFromCart(title);
+        });
+      });
+    }
+
+    function openCart(){
+      cartPanel.classList.add('open');
+    }
+    function closeCart(){
+      cartPanel.classList.remove('open');
+    }
+
+    displayProducts(products);
+
+    searchInput.addEventListener('input', () => {
+      const query = searchInput.value.toLowerCase().trim();
+      const filtered = products.filter(p =>
+        p.brand.toLowerCase().includes(query) ||
+        p.title.toLowerCase().includes(query)
+      );
+      displayProducts(filtered);
+    });
+
+    cartToggle.addEventListener('click', () => {
+      if(cartPanel.classList.contains('open')){
+        closeCart();
+      } else {
+        openCart();
+      }
+    });
+
+    cartClose.addEventListener('click', closeCart);
+
+  </script>
+</body>
+</html>
