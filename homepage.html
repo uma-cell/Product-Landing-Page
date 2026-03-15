@@ -398,111 +398,139 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-  <script>
-    const SUPABASE_URL = "https://yqcfgibzaideatrmvnvi.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlxY2ZnaWJ6YWlkZWF0cm12bnZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0MTk4ODEsImV4cCI6MjA3NDk5NTg4MX0.pRYlFcopxyDIuFattGFlciAzPSbR9m8KM4tOD-DqHno";
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+<script>
+  // 🔹 Supabase config
+  const SUPABASE_URL = "https://ibhdljciuokvzuxlnqdg.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImliaGRsamNpdW9rdnp1eGxucWRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1Mzg5MTIsImV4cCI6MjA4OTExNDkxMn0.sp7u--fRvjWJWUDh5ZXsd4DB6vA6fEejJpnDV6na8i8";
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    let currentUser = null;
+  let currentUser = null;
 
-    async function checkUser() {
-      const { data: { user } } = await supabaseClient.auth.getUser();
-      if (user) {
-        currentUser = user;
-        document.getElementById("welcomeName").innerText = user.user_metadata.full_name || user.email;
-        document.getElementById("profileSection").style.display = "flex";
-        fetchUserAddress();
-      } else {
-        window.location.href = "index.html";
-      }
-    }
+  // 🔹 Check logged in user
+  async function checkUser() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    const user = session?.user;
 
-    async function logoutUser() {
-      localStorage.removeItem("userAddress");
-      document.getElementById("userAddressDiv")?.remove();
-      await supabaseClient.auth.signOut();
+    if (user) {
+      currentUser = user;
+      document.getElementById("welcomeName").innerText = user.user_metadata.full_name || user.email;
+      document.getElementById("profileSection").style.display = "flex";
+      fetchUserAddress();
+    } else {
       window.location.href = "index.html";
     }
-    document.getElementById("logoutBtn").addEventListener("click", logoutUser);
-    checkUser();
+  }
 
-    const profileModal = document.getElementById("profileModal");
-    const profileLink = document.getElementById("profileLink");
-    const profileImage = document.getElementById("profileImage");
+  // 🔹 Logout
+  async function logoutUser() {
+    localStorage.removeItem("userAddress");
+    document.getElementById("userAddressDiv")?.remove();
+    await supabaseClient.auth.signOut();
+    window.location.href = "index.html";
+  }
+  document.getElementById("logoutBtn").addEventListener("click", logoutUser);
 
-    profileLink.addEventListener("click", openProfileModal);
-    profileImage.addEventListener("click", openProfileModal);
+  checkUser();
 
-    function openProfileModal() {
-      profileModal.style.display = "flex";
-      fetchUserAddress();
+  // 🔹 Profile modal
+  const profileModal = document.getElementById("profileModal");
+  const profileLink = document.getElementById("profileLink");
+  const profileImage = document.getElementById("profileImage");
+
+  profileLink.addEventListener("click", openProfileModal);
+  profileImage.addEventListener("click", openProfileModal);
+
+  function openProfileModal() {
+    profileModal.style.display = "flex";
+    fetchUserAddress();
+  }
+
+  function closeProfileModal() {
+    profileModal.style.display = "none";
+  }
+
+  // 🔹 Save address
+  document.getElementById("profileForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    if (!currentUser) {
+      alert("User not logged in!");
+      return;
     }
 
-    function closeProfileModal() {
-      profileModal.style.display = "none";
+    const formData = new FormData(e.target);
+    const phone = formData.get("phone");
+    const door_no = formData.get("door");
+    const street = formData.get("street");
+    const building = formData.get("building");
+    const district = formData.get("district");
+    const state = formData.get("state");
+
+    // ✅ Insert into Supabase
+    const { data, error } = await supabaseClient
+      .from("addresses")
+      .insert([
+        { user_id: currentUser.id, phone, door_no, street, building, district, state }
+      ]);
+
+    if (error) {
+      console.error(error);
+      alert("❌ Failed to save address: " + error.message);
+    } else {
+      const savedData = { phone, door_no, street, building, district, state };
+      localStorage.setItem("userAddress", JSON.stringify(savedData));
+      showAddressOnPage(savedData);
+      alert("✅ Address saved successfully!");
+      closeProfileModal();
+    }
+  });
+
+  // 🔹 Fetch saved address
+  async function fetchUserAddress() {
+    if (!currentUser) return;
+
+    const local = localStorage.getItem("userAddress");
+    if (local) showAddressOnPage(JSON.parse(local));
+
+    const { data, error } = await supabaseClient
+      .from("addresses")
+      .select("*")
+      .eq("user_id", currentUser.id)
+      .single();
+
+    if (error) {
+      console.log("Fetch address error:", error.message);
+      return;
     }
 
-    document.getElementById("profileForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const formData = new FormData(e.target);
-      const phone = formData.get("phone");
-      const door_no = formData.get("door");
-      const street = formData.get("street");
-      const building = formData.get("building");
-      const district = formData.get("district");
-      const state = formData.get("state");
+    if (data) {
+      localStorage.setItem("userAddress", JSON.stringify(data));
+      showAddressOnPage(data);
+    }
+  }
 
-      const { data, error } = await supabaseClient
-        .from("addresses")
-        .upsert([{ user_id: currentUser.id, phone, door_no, street, building, district, state }], { onConflict: ['user_id'] });
-
-      if (error) {
-        console.error(error);
-        alert("❌ Failed to save address");
-      } else {
-        const savedData = { phone, door_no, street, building, district, state };
-        localStorage.setItem("userAddress", JSON.stringify(savedData));
-        showAddressOnPage(savedData);
-        alert("✅ Address details saved successfully!");
-        closeProfileModal();
-      }
-    });
-
-    async function fetchUserAddress() {
-      const local = localStorage.getItem("userAddress");
-      if (local) showAddressOnPage(JSON.parse(local));
-
-      const { data } = await supabaseClient
-        .from("addresses")
-        .select("*")
-        .eq("user_id", currentUser.id)
-        .single();
-      if (data) {
-        localStorage.setItem("userAddress", JSON.stringify(data));
-        showAddressOnPage(data);
-      }
+  // 🔹 Show address in modal
+  function showAddressOnPage(address) {
+    let existingDiv = document.getElementById("userAddressDiv");
+    if (!existingDiv) {
+      existingDiv = document.createElement("div");
+      existingDiv.id = "userAddressDiv";
+      existingDiv.style.background = "#f9f9ff";
+      existingDiv.style.marginTop = "10px";
+      existingDiv.style.padding = "10px";
+      existingDiv.style.borderRadius = "10px";
+      existingDiv.style.fontSize = "14px";
+      existingDiv.style.color = "#333";
+      document.querySelector("#profileModal .modal-content").appendChild(existingDiv);
     }
 
-    function showAddressOnPage(address) {
-      let existingDiv = document.getElementById("userAddressDiv");
-      if (!existingDiv) {
-        existingDiv = document.createElement("div");
-        existingDiv.id = "userAddressDiv";
-        existingDiv.style.background = "#f9f9ff";
-        existingDiv.style.marginTop = "10px";
-        existingDiv.style.padding = "10px";
-        existingDiv.style.borderRadius = "10px";
-        existingDiv.style.fontSize = "14px";
-        existingDiv.style.color = "#333";
-        document.querySelector("#profileModal .modal-content").appendChild(existingDiv);
-      }
-      existingDiv.innerHTML = `
-        <strong>Saved Address:</strong><br>
-        📞 ${address.phone}<br>
-        🏠 ${address.door_no}, ${address.street}, ${address.building}<br>
-        🏡 ${address.district}, ${address.state}
-      `;
-    }
+    existingDiv.innerHTML = `
+      <strong>Saved Address:</strong><br>
+      📞 ${address.phone}<br>
+      🏠 ${address.door_no}, ${address.street}, ${address.building}<br>
+      🏡 ${address.district}, ${address.state}
+    `;
+  }
 
     // Search handler
     function handleSearch(event) {
